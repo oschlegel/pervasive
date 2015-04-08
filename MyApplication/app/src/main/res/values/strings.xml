@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Raum Information</string>
+    <string name="title_activitiy_room_details">Rauminformationen</string>
 
     <string name="action_settings">Settings</string>
+    <string name="room_detail_lblRoom">Raum:</string>
 </resources>
