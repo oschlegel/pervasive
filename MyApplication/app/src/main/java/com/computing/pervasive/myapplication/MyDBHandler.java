@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.sql.Time;
 import java.text.ParseException;
@@ -91,7 +90,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(TAG, "Oncreate " + CREATE_ROOM_TABLE);
         try {
             db.execSQL(ENABLE_FOREIGN_KEYS);
             db.execSQL(CREATE_BLOCK_TABLE);
@@ -115,8 +113,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             addBuildingSQL(db, bau1);
 
             addRoomSQL(db, new Room(1, "1/101", 40, "Beamer", null, bau1));
-            addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", null, bau1));
-
+            addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", "73676723-7400-0000-ffff-0000ffff0005", bau1));
 
         }
         catch (SQLiteException e)
@@ -141,6 +138,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_ROOM_NAME, room.getRoomName());
         values.put(COLUMN_ROOM_SEAT_COUNT, room.getSeatCount());
         values.put(COLUMN_ROOM_SETUP, room.getSetup());
+        values.put(COLUMN_BUILDING_ID, room.getBeaconID());
         values.put(COLUMN_BUILDING_ID, room.getBuilding().getBuildingID());
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -157,8 +155,21 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         Room room = null;
         if (cursor.moveToFirst()) {
-            Building b = getBuilding(cursor.getInt(4));
-            room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(5), b);
+            Building b = getBuilding(cursor.getInt(5));
+            room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(4), b);
+        }
+        db.close();
+        return room;
+    }
+
+    public Room findRoom(String beaconID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_ROOMS, null, COLUMN_BEACON_ID + " = '" + beaconID + "'", null, null, null, null);
+
+        Room room = null;
+        if (cursor.moveToFirst()) {
+            Building b = getBuilding(cursor.getInt(5));
+            room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(4), b);
         }
         db.close();
         return room;
@@ -172,8 +183,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
         List<Room> rooms = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                Building b = getBuilding(cursor.getInt(4));
-                Room room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(5), b);
+                Building b = getBuilding(cursor.getInt(5));
+                Room room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(4), b);
                 rooms.add(room);
             } while (cursor.moveToNext());
         }
@@ -189,8 +200,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
         List<Room> rooms = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                Building b = getBuilding(cursor.getInt(4));
-                Room room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(5), b);
+                Building b = getBuilding(cursor.getInt(5));
+                Room room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), cursor.getString(4), b);
                 rooms.add(room);
             } while (cursor.moveToNext());
         }
@@ -205,6 +216,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_ROOM_NAME, room.getRoomName());
         values.put(COLUMN_ROOM_SEAT_COUNT, room.getSeatCount());
         values.put(COLUMN_ROOM_SETUP, room.getSetup());
+        values.put(COLUMN_BEACON_ID, room.getBeaconID());
         values.put(COLUMN_BUILDING, room.getBuilding().getBuildingID());
         db.insert(TABLE_ROOMS, null, values);
     }

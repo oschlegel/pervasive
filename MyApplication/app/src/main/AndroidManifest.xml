@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+    <uses-feature android:name="android.database.sqlite.SQLiteDatabase" android:required="true" />
+    <uses-feature android:name="android.bluetooth.BluetoothAdapter" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -29,7 +31,8 @@
         <activity
             android:name=".RoomDetail"
             android:label="@string/title_activitiy_room_details"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

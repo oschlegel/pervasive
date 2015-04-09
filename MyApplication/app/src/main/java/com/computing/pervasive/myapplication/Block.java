@@ -1,11 +1,12 @@
 package com.computing.pervasive.myapplication;
 
+import java.io.Serializable;
 import java.sql.Time;
 
 /**
  * Created by Thomas on 08.04.2015.
  */
-public class Block {
+public class Block implements Serializable {
 
     private int id;
     private String name;

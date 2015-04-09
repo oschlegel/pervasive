@@ -1,11 +1,12 @@
 package com.computing.pervasive.myapplication;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Thomas on 08.04.2015.
  */
-public class Lecture {
+public class Lecture implements Serializable {
 
     private int id;
     private Date begin;

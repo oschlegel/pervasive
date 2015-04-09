@@ -4,4 +4,10 @@
 
     <string name="action_settings">Settings</string>
     <string name="room_detail_lblRoom">Raum:</string>
+    <string name="room_detail_lblBeaconID">BeaconID:</string>
+    <string name="room_detail_lblSeat_Count">Seat Count:</string>
+    <string name="room_detail_lblSetup">Setup:</string>
+    <string name="room_detail_lblBuilding">Building:</string>
+    <string name="room_detail_lblRoomID">RoomID:</string>
+    <string name="room_detail_lblRoomName">RoomName:</string>
 </resources>
