@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -30,12 +31,15 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     protected static final String TAG = "MainActivity";
     private BeaconManager beaconManager;
     private MyDBHandler handlerDB = new MyDBHandler(this);
-    private Intent intent;
+    private Intent intent = null;
+    private Region REGION = new Region("MyUnifiedID", null, null, null);
+    private Room lastroom = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
@@ -46,6 +50,8 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.bind(this);
+
+        setContentView(R.layout.activity_main);
 
         ListView mainListView = (ListView) findViewById( R.id.mainListView );
 
@@ -63,7 +69,6 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 }
             });
         }
-
     }
 
     @Override
@@ -120,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     if (beacon == null)
                     {
                         beacon = b;
-                        break;
+                        continue;
                     }
                     if (b.getDistance() < beacon.getDistance()) {
                         beacon = b;
@@ -149,7 +154,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             }
         });
         try {
-            beaconManager.startRangingBeaconsInRegion(new Region("MyUnifiedID", null, null, null));
+            beaconManager.startRangingBeaconsInRegion(REGION);
             Log.d(TAG, "Start Ranging");
         }
         catch (RemoteException e) {
@@ -176,12 +181,15 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     {
         Room room = handlerDB.findRoom(beaconID);
 
-        if (room != null)
-        {
-            intent = new Intent(this, RoomDetail.class);
-            intent.putExtra("keep", true);
-            intent.putExtra("ROOM", room);
-            startActivity(intent);
+        if (room != null) {
+            if (lastroom == null || lastroom != room) {
+                lastroom = room;
+                intent = new Intent(this, RoomDetail.class);
+                intent.putExtra("keep", true);
+                intent.putExtra("ROOM", room);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
         }
         else {
             Log.d(TAG, "No match found!");
@@ -204,6 +212,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             intent = new Intent(this, RoomDetail.class);
             intent.putExtra("keep", true);
             intent.putExtra("ROOM", room);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
         else {

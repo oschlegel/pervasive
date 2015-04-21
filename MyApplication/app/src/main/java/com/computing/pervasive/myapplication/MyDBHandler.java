@@ -112,7 +112,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
             addBuildingSQL(db, bau1);
 
-            addRoomSQL(db, new Room(1, "1/101", 40, "Beamer", null, bau1));
+            addRoomSQL(db, new Room(1, "1/101", 40, "Beamer", "73676723-7400-0000-ffff-0000ffff0002", bau1));
             addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", "73676723-7400-0000-ffff-0000ffff0005", bau1));
 
         }

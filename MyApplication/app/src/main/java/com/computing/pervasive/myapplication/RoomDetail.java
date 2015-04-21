@@ -18,6 +18,32 @@ public class RoomDetail extends ActionBarActivity {
 
         Intent intent = getIntent();
 
+        setView(intent);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        boolean keep = intent.getExtras().getBoolean("keep");
+        if(!keep)
+        {
+            finish();
+        }
+        setView(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setView(Intent intent)
+    {
         if (intent.hasExtra("ROOM")) {
             Room room = (Room) intent.getSerializableExtra("ROOM");
             if (room != null) {
@@ -38,26 +64,4 @@ public class RoomDetail extends ActionBarActivity {
             }
         }
     }
-
-    @Override
-    protected void onNewIntent(Intent intent)
-    {
-        super.onNewIntent(intent);
-        boolean keep = intent.getExtras().getBoolean("keep");
-        if(!keep)
-        {
-            finish();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
 }
