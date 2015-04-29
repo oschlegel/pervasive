@@ -282,11 +282,14 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     protected Boolean isActivityRunning(Class activityClass)
     {
         ActivityManager activityManager = (ActivityManager) getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+        //List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+        List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
 
-        for (ActivityManager.RunningTaskInfo task : tasks) {
-            if (activityClass.getCanonicalName().equalsIgnoreCase(task.baseActivity.getClassName()))
+        for (ActivityManager.RunningAppProcessInfo task : tasks) {
+            if (task.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
                 return true;
+            /*if (activityClass.getCanonicalName().equalsIgnoreCase(task.baseActivity.getClassName()))
+                return true;*/
         }
 
         return false;
