@@ -1,8 +1,10 @@
 package com.computing.pervasive.myapplication;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
@@ -25,7 +27,6 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -48,25 +49,49 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
         // Check if Bluetooth is enabled and ask for it if not
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 1);
+        if (mBluetoothAdapter == null) {
+            Log.d(TAG, "No Bluetooth detected!");
+            new AlertDialog.Builder(this)
+                    .setTitle("No Bluetooth detected!")
+                    .setMessage("You can't use this app on your device.")
+                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }).show();
+
         }
+        else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Bluetooth disabled")
+                        .setMessage("Do you want to enable bluetooth?\nOtherwise you close this app.")
+                        .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                BluetoothAdapter.getDefaultAdapter().enable();
+                            }
+                        })
+                        .setNegativeButton("Close app", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
 
-        // Create BeaconManager
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.bind(this);
+            // Create BeaconManager
+            beaconManager = BeaconManager.getInstanceForApplication(this);
+            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
+            beaconManager.bind(this);
 
-        setContentView(R.layout.activity_main);
+            setContentView(R.layout.activity_main);
 
-        ListView mainListView = (ListView) findViewById( R.id.mainListView );
+            ListView mainListView = (ListView) findViewById(R.id.mainListView);
 
-        /*rooms = handlerDB.getAllRoomsSorted();
-        rooms.add(new Room("1/U37", 100, "Tiefenhörsaal", null, handlerDB.getBuilding(1)));
-
-        if (!rooms.isEmpty()) {
-            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, rooms);
+            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, new ArrayList<Room>());
             mainListView.setAdapter(mainListAdapter);
             mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -75,65 +100,26 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     lookupRoom(room.getRoomID());
                 }
             });
-        }*/
-        ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, new ArrayList<Room>());
-        mainListView.setAdapter(mainListAdapter);
-        mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Room room = (Room) parent.getItemAtPosition(position);
-                lookupRoom(room.getRoomID());
-            }
-        });
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        if (beaconManager != null) {
+            beaconManager.unbind(this);
+        }
     }
 
     @Override
     public void onBeaconServiceConnect() {
-        /*beaconManager.setMonitorNotifier(new MonitorNotifier() {
-            @Override
-            public void didEnterRegion(Region region) {
-                if (region != null){
-                    Log.i(TAG, "Detected beacon: " + region.toString());
-
-                    List<Room> rooms = new ArrayList<Room>();
-                    rooms.add(new Room("1/U37", 100, "Tiefenhörsaal", null, handlerDB.getBuilding(1)));
-
-                    final ListView mainListView = (ListView) findViewById( R.id.mainListView );
-                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, rooms);
-                    mainListView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mainListView.setAdapter(mainListAdapter);
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-                if (region != null) {
-                    Log.i(TAG, "Lost beacon: " + region.toString());
-                }
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int state, Region region) {
-                Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state);
-            }
-        });*/
 
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
                 // list all detected rooms
-                List<Room> rooms = new ArrayList<Room>();
+                List<Room> rooms = new ArrayList<>();
                 for (Beacon beac : beacons){
                     if (beac != null){
                         rooms.add(handlerDB.findRoom(beac.getId1().toString()));
@@ -163,55 +149,11 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
         try {
             beaconManager.startRangingBeaconsInRegion(REGION);
-            //beaconManager.startMonitoringBeaconsInRegion(new Region("MyUnifiedID", null, null, null));
             Log.i(TAG, "Start Monitoring");
         }
         catch (RemoteException e) {
             Log.i(TAG, "Error");
         }
-        /*beaconManager.setRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                Beacon beacon = null;
-                for (Beacon b : beacons) {
-                    if (beacon == null)
-                    {
-                        beacon = b;
-                        continue;
-                    }
-                    if (b.getDistance() < beacon.getDistance()) {
-                        beacon = b;
-                    }
-                }
-                if (beacon != null) {
-                    String beaconID = beacon.getId1().toString();
-                    if (beacon.getDistance() < 1) {
-                        lookupRoom(beaconID);
-                    }
-                    else {
-                        if (intent != null) {
-                            intent.putExtra("keep", false);
-                            startActivity(intent);
-                            intent = null;
-                        }
-                    }
-                }
-                else {
-                    if (intent != null) {
-                        intent.putExtra("keep", false);
-                        startActivity(intent);
-                        intent = null;
-                    }
-                }
-            }
-        });
-        try {
-            beaconManager.startRangingBeaconsInRegion(REGION);
-            Log.d(TAG, "Start Ranging");
-        }
-        catch (RemoteException e) {
-            Log.d(TAG, "Error");
-        }*/
     }
 
     @Override
@@ -282,14 +224,11 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     protected Boolean isActivityRunning(Class activityClass)
     {
         ActivityManager activityManager = (ActivityManager) getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
-        //List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
         List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
 
         for (ActivityManager.RunningAppProcessInfo task : tasks) {
             if (task.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
                 return true;
-            /*if (activityClass.getCanonicalName().equalsIgnoreCase(task.baseActivity.getClassName()))
-                return true;*/
         }
 
         return false;
