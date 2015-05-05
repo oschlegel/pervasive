@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.altbeacon.beacon.Beacon;
@@ -61,8 +63,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                         }
                     }).show();
 
-        }
-        else {
+        } else {
             if (!mBluetoothAdapter.isEnabled()) {
                 new AlertDialog.Builder(this)
                         .setTitle("Bluetooth disabled")
@@ -83,9 +84,19 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             }
 
             // Create BeaconManager
-            beaconManager = BeaconManager.getInstanceForApplication(this);
-            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
-            beaconManager.bind(this);
+            if (beaconManager == null) {
+                beaconManager = BeaconManager.getInstanceForApplication(this);
+                if (beaconManager != null) {
+                    BeaconParser bp = new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24");
+                    if (beaconManager.getBeaconParsers().size() < 2) {
+                        beaconManager.getBeaconParsers().add(bp);
+                    }
+                    beaconManager.bind(this);
+                }
+                else {
+                    throw new UnsupportedOperationException("No instance for beaconManager.");
+                }
+            }
 
             setContentView(R.layout.activity_main);
 
@@ -100,19 +111,37 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     lookupRoom(room.getRoomID());
                 }
             });
+
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (beaconManager != null) {
+        if (beaconManager != null)
+        {
+            try {
+                beaconManager.stopRangingBeaconsInRegion(REGION);
+            }
+            catch (RemoteException e)
+            {
+                Log.i(TAG, "Error");
+            }
             beaconManager.unbind(this);
+            beaconManager = null;
         }
     }
 
     @Override
     public void onBeaconServiceConnect() {
+
+        try {
+            beaconManager.startRangingBeaconsInRegion(REGION);
+            Log.i(TAG, "Start Monitoring");
+        }
+        catch (RemoteException e) {
+            Log.i(TAG, "Error");
+        }
 
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
@@ -120,9 +149,27 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
                 // list all detected rooms
                 List<Room> rooms = new ArrayList<>();
-                for (Beacon beac : beacons){
-                    if (beac != null){
-                        rooms.add(handlerDB.findRoom(beac.getId1().toString()));
+
+                Collections.sort((List) beacons, new Comparator<Beacon>() {
+                    @Override
+                    public int compare(Beacon lhs, Beacon rhs) {
+                        double dis1 = lhs.getDistance();
+                        double dis2 = rhs.getDistance();
+                        return dis1 <= dis2 ? -1 : 1 ;
+                    }
+                });
+
+                for (Beacon beac : beacons) {
+                    if (beac != null) {
+                        double dis = beac.getDistance();
+
+                        Room room = handlerDB.findRoom(beac.getId1().toString(), beac.getId2().toString(), beac.getId3().toString());
+
+                        if (room != null) {
+                            room.setDistance(dis);
+
+                            rooms.add(room);
+                        }
                     }
                 }
 
@@ -139,21 +186,13 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 }
 
                 // logcat message
-                String logtext = "Ranged following beacons:\n";
-                for (Beacon beac : beacons){
-                    logtext += beac.getId1().toString() + "\n";
-                }
-                Log.i(TAG,logtext);
+                //String logtext = "Ranged following beacons:\n";
+                //for (Beacon beac : beacons) {
+                //    logtext += beac.getId1().toString() + "\n";
+                //}
+                //Log.i(TAG, logtext);
             }
         });
-
-        try {
-            beaconManager.startRangingBeaconsInRegion(REGION);
-            Log.i(TAG, "Start Monitoring");
-        }
-        catch (RemoteException e) {
-            Log.i(TAG, "Error");
-        }
     }
 
     @Override
@@ -171,9 +210,9 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         return super.onOptionsItemSelected(item);
     }
 
-    private void lookupRoom(String beaconID)
+    /*private void lookupRoom(String beaconID1, String beaconID2, String beaconID3)
     {
-        Room room = handlerDB.findRoom(beaconID);
+        Room room = handlerDB.findRoom(beaconID1, beaconID2, beaconID3);
 
         if (room != null) {
             if (lastroom == null || lastroom != room) {
@@ -195,7 +234,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-    }
+    }*/
 
     private void lookupRoom(int roomID)
     {
@@ -204,7 +243,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         if (room != null)
         {
             intent = new Intent(this, RoomDetail.class);
-            intent.putExtra("keep", true);
+            //intent.putExtra("keep", true);
             intent.putExtra("ROOM", room);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

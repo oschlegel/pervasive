@@ -1,5 +1,7 @@
 package com.computing.pervasive.myapplication;
 
+import org.altbeacon.beacon.Beacon;
+
 import java.io.Serializable;
 
 /**
@@ -11,25 +13,26 @@ public class Room implements Serializable {
     private String name;
     private int seatcount;
     private String setup;
-    private String beaconID;
     private Building building;
+    private double distance;
+    private MyBeacon myBeacon;
 
-    public Room(int id, String name, int seatcount, String setup, String beaconID, Building building)
+    public Room(int id, String name, int seatcount, String setup, MyBeacon myBeacon, Building building)
     {
         this.id = id;
         this.name = name;
         this.seatcount = seatcount;
         this.setup = setup;
-        this.beaconID = beaconID;
+        this.myBeacon = myBeacon;
         this.building = building;
     }
 
-    public Room(String name, int seatcount, String setup, String beaconID, Building building)
+    public Room(String name, int seatcount, String setup, MyBeacon myBeacon, Building building)
     {
         this.name = name;
         this.seatcount = seatcount;
         this.setup = setup;
-        this.beaconID = beaconID;
+        this.myBeacon = myBeacon;
         this.building = building;
     }
 
@@ -56,14 +59,24 @@ public class Room implements Serializable {
         return building;
     }
 
-    public String getBeaconID()
+    public MyBeacon getMyBeacon() {
+        return myBeacon;
+    }
+
+    public void setDistance(double distance)
     {
-        return beaconID;
+        this.distance = distance;
+    }
+
+    public double getDistance()
+    {
+        return distance;
     }
 
     @Override
     public String toString()
     {
-        return !name.isEmpty() ? name : "Raum: " + id;
+        String na = !name.isEmpty() ? name  : "Raum: " + id;
+        return na + "\tDistanze: " + distance;
     }
 }

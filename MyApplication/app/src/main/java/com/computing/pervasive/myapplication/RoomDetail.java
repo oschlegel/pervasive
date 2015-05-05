@@ -25,11 +25,11 @@ public class RoomDetail extends ActionBarActivity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        boolean keep = intent.getExtras().getBoolean("keep");
-        if(!keep)
-        {
-            finish();
-        }
+        //boolean keep = intent.getExtras().getBoolean("keep");
+        //if(!keep)
+        //{
+        //    finish();
+        //}
         setView(intent);
     }
 
@@ -50,7 +50,7 @@ public class RoomDetail extends ActionBarActivity {
                 TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
                 lblRoomNumber.setText(room.toString());
                 TextView beaconID = (TextView) findViewById(R.id.beaconID);
-                beaconID.setText(room.getBeaconID());
+                beaconID.setText(room.getMyBeacon().getMacAdress());
                 TextView seatcount = (TextView) findViewById(R.id.seat_count);
                 seatcount.setText("" + room.getSeatCount());
                 TextView setup = (TextView) findViewById(R.id.room_setup);
