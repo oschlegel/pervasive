@@ -15,9 +15,7 @@ public class RoomDetail extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.room_details);
-
         Intent intent = getIntent();
-
         setView(intent);
     }
 
@@ -25,11 +23,6 @@ public class RoomDetail extends ActionBarActivity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        //boolean keep = intent.getExtras().getBoolean("keep");
-        //if(!keep)
-        //{
-        //    finish();
-        //}
         setView(intent);
     }
 

@@ -37,9 +37,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     protected static final String TAG = "MainActivity";
     private BeaconManager beaconManager;
     private MyDBHandler handlerDB = new MyDBHandler(this);
-    private Intent intent = null;
     private Region REGION = new Region("MyUnifiedID", null, null, null);
-    private Room lastroom = null;
     MainActivity instance;
 
     @Override
@@ -56,6 +54,12 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             new AlertDialog.Builder(this)
                     .setTitle("No Bluetooth detected!")
                     .setMessage("You can't use this app on your device.")
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            finish();
+                        }
+                    })
                     .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -68,6 +72,12 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 new AlertDialog.Builder(this)
                         .setTitle("Bluetooth disabled")
                         .setMessage("Do you want to enable bluetooth?\nOtherwise you close this app.")
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                finish();
+                            }
+                        })
                         .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -155,7 +165,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     public int compare(Beacon lhs, Beacon rhs) {
                         double dis1 = lhs.getDistance();
                         double dis2 = rhs.getDistance();
-                        return dis1 <= dis2 ? -1 : 1 ;
+                        return dis1 <= dis2 ? -1 : 1;
                     }
                 });
 
@@ -176,7 +186,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 // update listview
                 if (isActivityRunning(instance.getClass())) {
                     final ListView mainListView = (ListView) findViewById(R.id.mainListView);
-                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, R.id.rowTextView,rooms);
+                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, R.id.rowTextView, rooms);
                     mainListView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -242,10 +252,8 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
         if (room != null)
         {
-            intent = new Intent(this, RoomDetail.class);
-            //intent.putExtra("keep", true);
+            Intent intent = new Intent(this, RoomDetail.class);
             intent.putExtra("ROOM", room);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
         else {
