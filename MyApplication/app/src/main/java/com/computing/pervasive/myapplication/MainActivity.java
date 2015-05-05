@@ -129,7 +129,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 // update listview
                 if (isActivityRunning(instance.getClass())) {
                     final ListView mainListView = (ListView) findViewById(R.id.mainListView);
-                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, rooms);
+                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, R.id.rowTextView,rooms);
                     mainListView.post(new Runnable() {
                         @Override
                         public void run() {
