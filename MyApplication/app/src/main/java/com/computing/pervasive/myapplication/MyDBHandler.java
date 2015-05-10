@@ -131,8 +131,11 @@ public class MyDBHandler extends SQLiteOpenHelper {
             MyBeacon b2 = new MyBeacon(2, "73676723-7400-0000-ffff-0000ffff0005", "50325", "16373", "78:A5:04:4A:29:89");
             addMyBeaconSQL(db, b1);
             addMyBeaconSQL(db, b2);
-            addRoomSQL(db, new Room(1, "1/101", 40, "Beamer", b1, bau1));
+            Room room = new Room(1, "1/101", 40, "Beamer", b1, bau1);
+            addRoomSQL(db, room);
             addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", b2, bau1));
+
+            addLectureSQL(db, new Lecture(1, new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room));
 
         }
         catch (SQLiteException e)
@@ -177,6 +180,20 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_ROOMS, null, values);
+        db.close();
+    }
+
+    private void addLecture(Lecture lecture){
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LECTURE_ID, lecture.getLectureID());
+        values.put(COLUMN_LECTURE_BEGIN, dateFormat.format(lecture.getBegin()));
+        values.put(COLUMN_LECTURE_END, dateFormat.format(lecture.getEnd()));
+        values.put(COLUMN_LECTURER, lecture.getLecturer());
+        values.put(COLUMN_BLOCK, lecture.getBlock().getBlockID());
+        values.put(COLUMN_ROOM, lecture.getRoom().getRoomID());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_LECTURE, null, values);
         db.close();
     }
 
@@ -303,6 +320,17 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.insert(TABLE_BLOCKS, null, values);
     }
 
+    private void addLectureSQL(SQLiteDatabase db, Lecture lecture){
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LECTURE_ID, lecture.getLectureID());
+        values.put(COLUMN_LECTURE_BEGIN, dateFormat.format(lecture.getBegin()));
+        values.put(COLUMN_LECTURE_END, dateFormat.format(lecture.getEnd()));
+        values.put(COLUMN_LECTURER, lecture.getLecturer());
+        values.put(COLUMN_BLOCK, lecture.getBlock().getBlockID());
+        values.put(COLUMN_ROOM, lecture.getRoom().getRoomID());
+        db.insert(TABLE_LECTURE, null, values);
+    }
+
     private void addBuildingSQL(SQLiteDatabase db, Building building)
     {
         ContentValues values = new ContentValues();
@@ -381,6 +409,16 @@ public class MyDBHandler extends SQLiteOpenHelper {
             block = new Block(cursor.getInt(0), cursor.getString(1), parseTime(cursor.getString(2)), parseTime(cursor.getString(3)), Day.valueOf(cursor.getString(4)));
         }
         db.close();
+        return block;
+    }
+
+    public Block getBlockSQL(SQLiteDatabase db, int id)
+    {
+        Block block = null;
+        Cursor cursor = db.query(TABLE_BLOCKS, null, COLUMN_BLOCK_ID + " = " + id, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            block = new Block(cursor.getInt(0), cursor.getString(1), parseTime(cursor.getString(2)), parseTime(cursor.getString(3)), Day.valueOf(cursor.getString(4)));
+        }
         return block;
     }
 
