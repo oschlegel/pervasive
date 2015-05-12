@@ -2,7 +2,7 @@
     <string name="app_name">HfT Roomer</string>
     <string name="title_activitiy_room_details">Room Details</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Einstellungen</string>
     <string name="room_detail_lblRoom">Raum:</string>
     <string name="room_detail_lblBeaconID">BeaconID:</string>
     <string name="room_detail_lblSeat_Count">Seat Count:</string>
@@ -10,4 +10,7 @@
     <string name="room_detail_lblBuilding">Building:</string>
     <string name="room_detail_lblRoomID">RoomID:</string>
     <string name="room_detail_lblRoomName">RoomName:</string>
+    <string name="lblLecture">Lecture:</string>
+    <string name="setting_online">Daten online abrufen?</string>
+    <string name="setting_checkBox_online">online abrufen</string>
 </resources>

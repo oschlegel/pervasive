@@ -135,7 +135,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             addRoomSQL(db, room);
             addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", b2, bau1));
 
-            addLectureSQL(db, new Lecture(1, new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room));
+            addLectureSQL(db, new Lecture(1, "UBQ", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room));
 
         }
         catch (SQLiteException e)
@@ -204,11 +204,21 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         Room room = null;
         if (cursor.moveToFirst()) {
-            Building b = getBuilding(cursor.getInt(5));
-            MyBeacon myb = getMyBeacon(cursor.getInt(4));
-            room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), myb, b);
+            int buildingID = cursor.getInt(5);
+            int myBeaconID = cursor.getInt(4);
+            int roomID = cursor.getInt(0);
+            String roomName = cursor.getString(1);
+            int seatcount = cursor.getInt(2);
+            String setup = cursor.getString(3);
+            cursor.close();
+            db.close();
+            Building b = getBuilding(buildingID);
+            MyBeacon myb = getMyBeacon(myBeaconID);
+            room = new Room(roomID, roomName, seatcount, setup, myb, b);
         }
-        db.close();
+        if (db.isOpen()) {
+            db.close();
+        }
         return room;
     }
 
@@ -226,6 +236,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 Building b = getBuilding(cursor.getInt(5));
                 room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), myBeacon, b);
             }
+            cursor.close();
             db.close();
         }
         return room;
@@ -245,6 +256,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 Building b = getBuilding(cursor.getInt(5));
                 room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), myBeacon, b);
             }
+            cursor.close();
             db.close();
         }
         return room;

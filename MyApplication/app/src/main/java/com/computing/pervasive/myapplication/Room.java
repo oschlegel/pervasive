@@ -1,7 +1,5 @@
 package com.computing.pervasive.myapplication;
 
-import org.altbeacon.beacon.Beacon;
-
 import java.io.Serializable;
 
 /**
@@ -14,7 +12,6 @@ public class Room implements Serializable {
     private int seatcount;
     private String setup;
     private Building building;
-    private double distance;
     private MyBeacon myBeacon;
 
     public Room(int id, String name, int seatcount, String setup, MyBeacon myBeacon, Building building)
@@ -63,20 +60,9 @@ public class Room implements Serializable {
         return myBeacon;
     }
 
-    public void setDistance(double distance)
-    {
-        this.distance = distance;
-    }
-
-    public double getDistance()
-    {
-        return distance;
-    }
-
     @Override
     public String toString()
     {
-        String na = !name.isEmpty() ? name  : "Raum: " + id;
-        return na + "\tDistanze: " + distance;
+        return !name.isEmpty() ? name  : "Raum: " + id;
     }
 }

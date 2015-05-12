@@ -2,10 +2,15 @@ package com.computing.pervasive.myapplication;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -33,6 +38,8 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 public class MainActivity extends ActionBarActivity implements BeaconConsumer {
+
+    private static final String ONLINE_PREF = "ONLINE_PREFERENCE";
 
     protected static final String TAG = "MainActivity";
     private BeaconManager beaconManager;
@@ -90,6 +97,13 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                                 finish();
                             }
                         })
+                        .show();
+            }
+            if (isOnlineMode() && !isOnline()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("kein Internet verfügbar")
+                        .setMessage("Bitte eine Verbindung zum Internet herstellen oder in den Offline-Modus wechseln")
+                        .setPositiveButton("Ok", null)
                         .show();
             }
 
@@ -169,15 +183,12 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     }
                 });
 
-                for (Beacon beac : beacons) {
-                    if (beac != null) {
-                        double dis = beac.getDistance();
+                for (Beacon beacon : beacons) {
+                    if (beacon != null) {
 
-                        Room room = handlerDB.findRoom(beac.getId1().toString(), beac.getId2().toString(), beac.getId3().toString());
+                        Room room = handlerDB.findRoom(beacon.getId1().toString(), beacon.getId2().toString(), beacon.getId3().toString());
 
                         if (room != null) {
-                            room.setDistance(dis);
-
                             rooms.add(room);
                         }
                     }
@@ -195,12 +206,6 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     });
                 }
 
-                // logcat message
-                //String logtext = "Ranged following beacons:\n";
-                //for (Beacon beac : beacons) {
-                //    logtext += beac.getId1().toString() + "\n";
-                //}
-                //Log.i(TAG, logtext);
             }
         });
     }
@@ -215,36 +220,12 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /*private void lookupRoom(String beaconID1, String beaconID2, String beaconID3)
-    {
-        Room room = handlerDB.findRoom(beaconID1, beaconID2, beaconID3);
-
-        if (room != null) {
-            if (lastroom == null || lastroom != room) {
-                lastroom = room;
-                intent = new Intent(this, RoomDetail.class);
-                intent.putExtra("keep", true);
-                intent.putExtra("ROOM", room);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }
-        else {
-            Log.d(TAG, "No match found!");
-
-            Context context = getApplicationContext();
-            CharSequence text = "No match found!";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-    }*/
 
     private void lookupRoom(int roomID)
     {
@@ -254,6 +235,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         {
             Intent intent = new Intent(this, RoomDetail.class);
             intent.putExtra("ROOM", room);
+            intent.putExtra("MYBEACON", room.getMyBeacon());
             startActivity(intent);
         }
         else {
@@ -281,4 +263,15 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         return false;
     }
 
+    private boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    private boolean isOnlineMode() {
+        SharedPreferences settings = getSharedPreferences(ONLINE_PREF, 0);
+        boolean online = settings.getBoolean("ONLINE", false);
+        return online;
+    }
 }

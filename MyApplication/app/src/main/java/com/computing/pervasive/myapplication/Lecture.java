@@ -9,15 +9,17 @@ import java.util.Date;
 public class Lecture implements Serializable {
 
     private int id;
+    private String name;
     private Date begin;
     private Date end;
     private String lecturer;
     private Block block;
     private Room room;
 
-    public Lecture(int id, Date begin, Date end, String lecturer, Block block, Room room)
+    public Lecture(int id,  String name, Date begin, Date end, String lecturer, Block block, Room room)
     {
         this.id = id;
+        this.name = name;
         this.begin = begin;
         this.end = end;
         this.lecturer = lecturer;
@@ -28,6 +30,10 @@ public class Lecture implements Serializable {
     public int getLectureID()
     {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Date getBegin()
