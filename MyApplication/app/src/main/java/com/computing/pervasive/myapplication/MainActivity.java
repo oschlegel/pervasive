@@ -1,8 +1,6 @@
 package com.computing.pervasive.myapplication;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,7 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Message;
+import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -115,6 +113,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     if (beaconManager.getBeaconParsers().size() < 2) {
                         beaconManager.getBeaconParsers().add(bp);
                     }
+                    setBeaconService();
                     beaconManager.bind(this);
                 }
                 else {
@@ -158,7 +157,6 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-
         try {
             beaconManager.startRangingBeaconsInRegion(REGION);
             Log.i(TAG, "Start Monitoring");
@@ -166,46 +164,14 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         catch (RemoteException e) {
             Log.i(TAG, "Error");
         }
+    }
 
+    private void setBeaconService() {
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-
-                // list all detected rooms
-                List<Room> rooms = new ArrayList<>();
-
-                Collections.sort((List) beacons, new Comparator<Beacon>() {
-                    @Override
-                    public int compare(Beacon lhs, Beacon rhs) {
-                        double dis1 = lhs.getDistance();
-                        double dis2 = rhs.getDistance();
-                        return dis1 <= dis2 ? -1 : 1;
-                    }
-                });
-
-                for (Beacon beacon : beacons) {
-                    if (beacon != null) {
-
-                        Room room = handlerDB.findRoom(beacon.getId1().toString(), beacon.getId2().toString(), beacon.getId3().toString());
-
-                        if (room != null) {
-                            rooms.add(room);
-                        }
-                    }
-                }
-
-                // update listview
-                if (isActivityRunning(instance.getClass())) {
-                    final ListView mainListView = (ListView) findViewById(R.id.mainListView);
-                    final ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(instance, R.layout.simple_row, R.id.rowTextView, rooms);
-                    mainListView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mainListView.setAdapter(mainListAdapter);
-                        }
-                    });
-                }
-
+                BeaconLooker task = new BeaconLooker();
+                task.execute(beacons);
             }
         });
     }
@@ -250,19 +216,6 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         }
     }
 
-    protected Boolean isActivityRunning(Class activityClass)
-    {
-        ActivityManager activityManager = (ActivityManager) getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
-
-        for (ActivityManager.RunningAppProcessInfo task : tasks) {
-            if (task.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
-                return true;
-        }
-
-        return false;
-    }
-
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -271,7 +224,46 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
     private boolean isOnlineMode() {
         SharedPreferences settings = getSharedPreferences(ONLINE_PREF, 0);
-        boolean online = settings.getBoolean("ONLINE", false);
-        return online;
+        return settings.getBoolean("ONLINE", false);
+    }
+
+    private class BeaconLooker extends AsyncTask<Collection<Beacon>, Void, List<Room>> {
+
+        private final ListView mainListView = (ListView) findViewById(R.id.mainListView);
+
+        @Override
+        protected List<Room> doInBackground(Collection<Beacon>... beacons) {
+            List<Room> rooms = new ArrayList<>();
+
+            Collections.sort((List) beacons[0], new Comparator<Beacon>() {
+                @Override
+                public int compare(Beacon lhs, Beacon rhs) {
+                    double dis1 = lhs.getDistance();
+                    double dis2 = rhs.getDistance();
+                    return dis1 <= dis2 ? -1 : 1;
+                }
+            });
+
+            for (Beacon beacon : beacons[0]) {
+                if (beacon != null) {
+
+                    Room room = handlerDB.findRoom(beacon.getId1().toString(), beacon.getId2().toString(), beacon.getId3().toString());
+
+                    if (room != null) {
+                        rooms.add(room);
+                    }
+                }
+            }
+
+            return rooms;
+        }
+
+        @Override
+        protected void onPostExecute(List<Room> rooms) {
+            super.onPostExecute(rooms);
+            ArrayAdapter<Room> mainListAdapter = (ArrayAdapter<Room>) mainListView.getAdapter();
+            mainListAdapter.clear();
+            mainListAdapter.addAll(rooms);
+        }
     }
 }

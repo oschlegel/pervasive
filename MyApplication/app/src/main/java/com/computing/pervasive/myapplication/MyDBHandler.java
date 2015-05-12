@@ -16,13 +16,13 @@ import java.util.List;
 
 /**
  * Created by Thomas on 04.04.2015.
+ *
  */
 public class MyDBHandler extends SQLiteOpenHelper {
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static final String TAG ="DBHelper";
     private static final int DATABASE_Version = 1;
     private static final String DATABASE_NAME = "roomDB.db";
     private static final String TABLE_BUILDING = "buildings";
@@ -165,7 +165,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_MYBEACONS, null, values);
-        db.close();
     }
 
     public void addRoom(Room room)
@@ -180,7 +179,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_ROOMS, null, values);
-        db.close();
     }
 
     private void addLecture(Lecture lecture){
@@ -194,7 +192,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_LECTURE, null, values);
-        db.close();
     }
 
     public Room findRoom(int id) {
@@ -210,15 +207,11 @@ public class MyDBHandler extends SQLiteOpenHelper {
             String roomName = cursor.getString(1);
             int seatcount = cursor.getInt(2);
             String setup = cursor.getString(3);
-            cursor.close();
-            db.close();
             Building b = getBuilding(buildingID);
             MyBeacon myb = getMyBeacon(myBeaconID);
             room = new Room(roomID, roomName, seatcount, setup, myb, b);
         }
-        if (db.isOpen()) {
-            db.close();
-        }
+        cursor.close();
         return room;
     }
 
@@ -237,7 +230,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), myBeacon, b);
             }
             cursor.close();
-            db.close();
         }
         return room;
     }
@@ -257,7 +249,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 room = new Room(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getString(3), myBeacon, b);
             }
             cursor.close();
-            db.close();
         }
         return room;
     }
@@ -276,7 +267,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 rooms.add(room);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
         return rooms;
     }
 
@@ -294,7 +285,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 rooms.add(room);
             } while (cursor.moveToNext());
         }
-        db.close();
+        cursor.close();
         return rooms;
     }
 
@@ -361,7 +352,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             building = new Building(cursor.getInt(0), cursor.getString(1));
         }
-        db.close();
+        cursor.close();
         return building;
     }
 
@@ -376,7 +367,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         {
             myBeacon = new MyBeacon(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
         }
-        db.close();
+        cursor.close();
         return myBeacon;
     }
 
@@ -391,7 +382,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         {
             myBeacon = new MyBeacon(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
         }
-        db.close();
+        cursor.close();
         return myBeacon;
     }
 
@@ -406,7 +397,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         {
             myBeacon = new MyBeacon(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
         }
-        db.close();
+        cursor.close();
         return myBeacon;
     }
 
@@ -420,7 +411,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             block = new Block(cursor.getInt(0), cursor.getString(1), parseTime(cursor.getString(2)), parseTime(cursor.getString(3)), Day.valueOf(cursor.getString(4)));
         }
-        db.close();
+        cursor.close();
         return block;
     }
 
@@ -431,6 +422,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             block = new Block(cursor.getInt(0), cursor.getString(1), parseTime(cursor.getString(2)), parseTime(cursor.getString(3)), Day.valueOf(cursor.getString(4)));
         }
+        cursor.close();
         return block;
     }
 

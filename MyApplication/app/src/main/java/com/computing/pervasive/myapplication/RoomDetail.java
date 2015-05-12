@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -21,6 +20,7 @@ import java.net.URL;
 
 /**
  * Created by Thomas on 06.04.2015.
+ *
  */
 public class RoomDetail extends ActionBarActivity {
 
@@ -47,15 +47,6 @@ public class RoomDetail extends ActionBarActivity {
                 task.execute(mybeacon);
             }
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setView(Room room)
@@ -90,7 +81,6 @@ public class RoomDetail extends ActionBarActivity {
                 lecture = getLecture(params[0]);
             }
             catch (Exception e) {
-                // TODO: handle exception
                 Log.d("DOWNLOAD", e.getMessage());
                 e.printStackTrace();
             }
@@ -141,7 +131,7 @@ public class RoomDetail extends ActionBarActivity {
                         lblRoomName.setText(name);
 
                         TextView txt = (TextView) findViewById(R.id.building);
-                        txt.setText("" + building.getInt("id"));
+                        txt.setText(""+buildingID);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -164,15 +154,13 @@ public class RoomDetail extends ActionBarActivity {
         }
 
         private JSONObject getRoom(MyBeacon mybeacon) throws Exception {
-            //URL url = new URL("http://hftroomer.appspot.com/rooms?beaconID1=1&beaconID2=2&beaconID3=1");
             URL url = new URL("http://hftroomer.appspot.com/rooms?macAdress="+mybeacon.getMacAdress());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/string");
             if (connection.getResponseCode() == 200) {
                 InputStream stream = connection.getInputStream();
-                JSONObject json = new JSONObject(readInput(stream));
-                return json;
+                return new JSONObject(readInput(stream));
             }
             return null;
         }
@@ -184,8 +172,7 @@ public class RoomDetail extends ActionBarActivity {
             connection.setRequestProperty("Accept", "application/string");
             if (connection.getResponseCode() == 200) {
                 InputStream stream = connection.getInputStream();
-                JSONObject json = new JSONObject(readInput(stream));
-                return json;
+                return new JSONObject(readInput(stream));
             }
             return null;
         }
@@ -196,7 +183,7 @@ public class RoomDetail extends ActionBarActivity {
             while ((line = br.readLine()) != null) {
                 result += line+"\n";
             }
-            if (result != "") {
+            if (!result.isEmpty()) {
                 result = result.substring(0,result.lastIndexOf('\n'));
             }
             return result;
