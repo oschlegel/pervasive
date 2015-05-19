@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             }
             if (isOnlineMode() && !isOnline()) {
                 new AlertDialog.Builder(this)
-                        .setTitle("kein Internet verfügbar")
+                        .setTitle("kein Internet verf\u00FCgbar")
                         .setMessage("Bitte eine Verbindung zum Internet herstellen oder in den Offline-Modus wechseln")
                         .setPositiveButton("Ok", null)
                         .show();

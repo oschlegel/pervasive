@@ -129,13 +129,24 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
             MyBeacon b1 = new MyBeacon(1, "73676723-7400-0000-ffff-0000ffff0007", "31539", "18343", "78:A5:04:4A:19:D4");
             MyBeacon b2 = new MyBeacon(2, "73676723-7400-0000-ffff-0000ffff0005", "50325", "16373", "78:A5:04:4A:29:89");
+            MyBeacon b3 = new MyBeacon(3, "73676723-7400-0000-ffff-0000ffff0002", "2", "233", "78:A5:04:4A:06:B2");
+            MyBeacon b4 = new MyBeacon(4, "73676723-7400-0000-ffff-0000ffff0002", "2", "544", "78:A5:04:4A:17:B4");
             addMyBeaconSQL(db, b1);
             addMyBeaconSQL(db, b2);
-            Room room = new Room(1, "1/101", 40, "Beamer", b1, bau1);
-            addRoomSQL(db, room);
-            addRoomSQL(db, new Room(2, "1/102", 30, "PC-Pool", b2, bau1));
+            addMyBeaconSQL(db, b3);
+            addMyBeaconSQL(db, b4);
 
-            addLectureSQL(db, new Lecture(1, "UBQ", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room));
+            Room room1 = new Room(1, "1/101", 40, "Beamer", b1, bau1);
+            Room room2 = new Room(2, "1/102", 30, "PC-Pool", b2, bau1);
+            Room room3 = new Room(3, "1/202", 30, "PC-Pool", b3, bau1);
+            Room room4 = new Room(4, "1/201", 40, "Beamer", b4, bau1);
+            addRoomSQL(db, room1);
+            addRoomSQL(db, room2);
+            addRoomSQL(db, room3);
+            addRoomSQL(db, room4);
+
+            addLectureSQL(db, new Lecture(1, "UBQ", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room1));
+            addLectureSQL(db, new Lecture(2, "ECom", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room3));
 
         }
         catch (SQLiteException e)
