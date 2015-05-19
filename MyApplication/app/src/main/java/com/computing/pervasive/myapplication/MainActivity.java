@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             }
             if (isOnlineMode() && !isOnline()) {
                 new AlertDialog.Builder(this)
-                        .setTitle("kein Internet verfügbar")
+                        .setTitle("kein Internet verfuegbar")
                         .setMessage("Bitte eine Verbindung zum Internet herstellen oder in den Offline-Modus wechseln")
                         .setPositiveButton("Ok", null)
                         .show();
@@ -125,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
             ListView mainListView = (ListView) findViewById(R.id.mainListView);
 
-            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, new ArrayList<Room>());
+            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, R.id.rowTextView, new ArrayList<Room>());
             mainListView.setAdapter(mainListAdapter);
             mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
