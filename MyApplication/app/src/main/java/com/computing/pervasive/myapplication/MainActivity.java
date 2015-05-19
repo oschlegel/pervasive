@@ -125,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
             ListView mainListView = (ListView) findViewById(R.id.mainListView);
 
-            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, new ArrayList<Room>());
+            ArrayAdapter<Room> mainListAdapter = new ArrayAdapter<>(this, R.layout.simple_row, R.id.rowTextView, new ArrayList<Room>());
             mainListView.setAdapter(mainListAdapter);
             mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
