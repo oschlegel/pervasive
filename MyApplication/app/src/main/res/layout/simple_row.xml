@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffbdd4ff"
+    android:id="@+id/listrow">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
+        android:id="@+id/RaumView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="16sp"
+        android:text="@string/lblRoom"
+        android:background="#ffbdd4ff">
+    </TextView>
+
+    <TextView
         android:id="@+id/rowTextView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textSize="16sp"
-        android:background="#ffbdd4ff">
+        android:background="#ffbdd4ff"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="false"
+        android:layout_toRightOf="@+id/RaumView">
     </TextView>
+</RelativeLayout>
