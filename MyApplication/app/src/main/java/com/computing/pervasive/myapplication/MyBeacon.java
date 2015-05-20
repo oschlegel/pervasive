@@ -13,15 +13,15 @@ public class MyBeacon implements Serializable {
     private String id1;
     private String id2;
     private String id3;
-    private String macAdress;
+    private String macAddress;
 
-    public MyBeacon(int id, String id1, String id2, String id3, String macAdress)
+    public MyBeacon(int id, String id1, String id2, String id3, String macAddress)
     {
         this.id = id;
         this.id1 = id1;
         this.id2 = id2;
         this.id3 = id3;
-        this.macAdress = macAdress;
+        this.macAddress = macAddress;
     }
 
     public int getID() {
@@ -40,7 +40,7 @@ public class MyBeacon implements Serializable {
         return id3;
     }
 
-    public String getMacAdress() {
-        return macAdress;
+    public String getMacAddress() {
+        return macAddress;
     }
 }

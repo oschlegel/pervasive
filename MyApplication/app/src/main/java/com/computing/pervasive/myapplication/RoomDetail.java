@@ -55,7 +55,7 @@ public class RoomDetail extends ActionBarActivity {
             TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
             lblRoomNumber.setText(room.toString());
             TextView beaconID = (TextView) findViewById(R.id.beaconID);
-            beaconID.setText(room.getMyBeacon().getMacAdress());
+            beaconID.setText(room.getMyBeacon().getMacAddress());
             TextView seatcount = (TextView) findViewById(R.id.seat_count);
             seatcount.setText("" + room.getSeatCount());
             TextView setup = (TextView) findViewById(R.id.room_setup);
@@ -111,14 +111,14 @@ public class RoomDetail extends ActionBarActivity {
                         if (building != null) {
                             buildingID = building.getInt("id");
                         }
-                        String macAdress = "";
+                        String macAddress = "";
                         if (myBeacon != null) {
-                            macAdress = myBeacon.getString("macadress");
+                            macAddress = myBeacon.getString("macaddress");
                         }
                         TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
                         lblRoomNumber.setText(name);
                         TextView beaconID = (TextView) findViewById(R.id.beaconID);
-                        beaconID.setText(macAdress);
+                        beaconID.setText(macAddress);
                         TextView lblSeatCount = (TextView) findViewById(R.id.seat_count);
                         lblSeatCount.setText("" + seatCount);
                         TextView lblSetup = (TextView) findViewById(R.id.room_setup);
@@ -154,7 +154,7 @@ public class RoomDetail extends ActionBarActivity {
         }
 
         private JSONObject getRoom(MyBeacon mybeacon) throws Exception {
-            URL url = new URL("http://hftroomer.appspot.com/rooms?macAdress="+mybeacon.getMacAdress());
+            URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress="+mybeacon.getMacAddress());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/string");
@@ -166,7 +166,7 @@ public class RoomDetail extends ActionBarActivity {
         }
 
         private JSONObject getLecture(MyBeacon mybeacon) throws Exception {
-            URL url = new URL("http://hftroomer.appspot.com/lectures?macAdress="+mybeacon.getMacAdress());
+            URL url = new URL("http://hftroomer.appspot.com/lectures?macAddress="+mybeacon.getMacAddress());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/string");

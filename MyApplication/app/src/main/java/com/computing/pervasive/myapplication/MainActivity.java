@@ -247,7 +247,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             for (Beacon beacon : beacons[0]) {
                 if (beacon != null) {
 
-                    Room room = handlerDB.findRoom(beacon.getId1().toString(), beacon.getId2().toString(), beacon.getId3().toString());
+                    Room room = handlerDB.findRoom(beacon.getBluetoothAddress());
 
                     if (room != null) {
                         rooms.add(room);

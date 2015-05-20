@@ -172,7 +172,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_BEACON_ID1, myBeacon.getID1());
         values.put(COLUMN_BEACON_ID2, myBeacon.getID2());
         values.put(COLUMN_BEACON_ID3, myBeacon.getID3());
-        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAdress());
+        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAddress());
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_MYBEACONS, null, values);
@@ -226,15 +226,15 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return room;
     }
 
-    public Room findRoom(String macAdress) {
+    public Room findRoom(String macAddress) {
         Room room = null;
 
-        MyBeacon myBeacon = getMyBeacon(macAdress);
+        MyBeacon myBeacon = getMyBeacon(macAddress);
 
         if (myBeacon != null) {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor cursor = db.query(TABLE_ROOMS, null, COLUMN_MYBEACON_ID + "= '" + myBeacon.getID() + "'", null, null, null, null);
+            Cursor cursor = db.query(TABLE_ROOMS, null, COLUMN_MYBEACON + "= '" + myBeacon.getID() + "'", null, null, null, null);
 
             if (cursor.moveToFirst()) {
                 Building b = getBuilding(cursor.getInt(5));
@@ -307,7 +307,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_BEACON_ID1, myBeacon.getID1());
         values.put(COLUMN_BEACON_ID2, myBeacon.getID2());
         values.put(COLUMN_BEACON_ID3, myBeacon.getID3());
-        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAdress());
+        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAddress());
         db.insert(TABLE_MYBEACONS, null, values);
     }
 
