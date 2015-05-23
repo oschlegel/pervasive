@@ -1,5 +1,6 @@
 package com.computing.pervasive.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -70,6 +71,15 @@ public class RoomDetail extends ActionBarActivity {
     }
 
     private class Download extends AsyncTask<MyBeacon, Void, JSONObject[]> {
+
+        private ProgressDialog dialog = new ProgressDialog(RoomDetail.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setMessage(RoomDetail.this.getString(R.string.waiting_Dialog));
+            this.dialog.show();
+        }
 
         @Override
         protected JSONObject[] doInBackground(MyBeacon... params) {
@@ -150,6 +160,10 @@ public class RoomDetail extends ActionBarActivity {
                     TextView lblLectureName = (TextView) findViewById(R.id.lecture);
                     lblLectureName.setText("keine Vorlesung");
                 }
+            }
+
+            if (dialog.isShowing()) {
+                dialog.dismiss();
             }
         }
 
