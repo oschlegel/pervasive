@@ -1,5 +1,8 @@
 package com.computing.pervasive.myapplication;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +16,11 @@ public class Building implements Serializable {
     public Building(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Building(JSONObject object) throws JSONException {
+        id = object.getInt("id");
+        name = object.getString("name");
     }
 
     public int getBuildingID()

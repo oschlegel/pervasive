@@ -22,11 +22,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -34,6 +42,7 @@ import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONObject;
 
 public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
@@ -44,6 +53,8 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
     private MyDBHandler handlerDB = new MyDBHandler(this);
     private Region REGION = new Region("MyUnifiedID", null, null, null);
     MainActivity instance;
+    private Map<String, Room> beaconRoomMap = new HashMap<>();
+    private Map<String, Room> beaconRoomMapOnline = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,13 +238,12 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         return settings.getBoolean("ONLINE", false);
     }
 
-    private class BeaconLooker extends AsyncTask<Collection<Beacon>, Void, List<Room>> {
+    private class BeaconLooker extends AsyncTask<Collection<Beacon>, Void, Collection<Beacon>> {
 
         private final ListView mainListView = (ListView) findViewById(R.id.mainListView);
 
         @Override
-        protected List<Room> doInBackground(Collection<Beacon>... beacons) {
-            List<Room> rooms = new ArrayList<>();
+        protected Collection<Beacon> doInBackground(Collection<Beacon>... beacons) {
 
             Collections.sort((List) beacons[0], new Comparator<Beacon>() {
                 @Override
@@ -244,26 +254,101 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                 }
             });
 
+
             for (Beacon beacon : beacons[0]) {
                 if (beacon != null) {
-
-                    Room room = handlerDB.findRoom(beacon.getBluetoothAddress());
-
-                    if (room != null) {
-                        rooms.add(room);
+                    if (!beaconRoomMap.containsKey(beacon.getBluetoothAddress())) {
+                        Room room = handlerDB.findRoom(beacon.getBluetoothAddress());
+                        beaconRoomMap.put(beacon.getBluetoothAddress(), room);
                     }
                 }
             }
 
-            return rooms;
+            if (isOnlineMode()) {
+                for (Beacon beacon : beacons[0]) {
+                    if (beacon != null) {
+                        if (!beaconRoomMapOnline.containsKey(beacon.getBluetoothAddress()))
+                        {
+                            GetRoomRemote task = new GetRoomRemote();
+                            task.execute(beacon.getBluetoothAddress());
+                        }
+                    }
+                }
+            }
+
+            return beacons[0];
         }
 
         @Override
-        protected void onPostExecute(List<Room> rooms) {
-            super.onPostExecute(rooms);
+        protected void onPostExecute(Collection<Beacon> beacons) {
+            super.onPostExecute(beacons);
             ArrayAdapter<Room> mainListAdapter = (ArrayAdapter<Room>) mainListView.getAdapter();
             mainListAdapter.clear();
-            mainListAdapter.addAll(rooms);
+            for (Beacon b : beacons) {
+                if (isOnlineMode()) {
+                    Room room = beaconRoomMapOnline.get(b.getBluetoothAddress());
+                    if (room != null) {
+                        mainListAdapter.add(room);
+                    }
+                    else {
+                        addRoomToListFromLocal(mainListAdapter, b);
+                    }
+                }
+                else {
+                    addRoomToListFromLocal(mainListAdapter, b);
+                }
+            }
+        }
+
+        private void addRoomToListFromLocal(ArrayAdapter<Room> mainListAdapter, Beacon b) {
+            Room room = beaconRoomMap.get(b.getBluetoothAddress());
+            if (room != null) {
+                mainListAdapter.add(room);
+            }
+        }
+    }
+
+    private class GetRoomRemote extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... macAddress) {
+            if (macAddress[0] == null)
+            {
+                throw new NullPointerException();
+            }
+            try {
+                JSONObject temp = getRoom(macAddress[0]);
+                Room room = new Room(temp);
+                beaconRoomMapOnline.put(macAddress[0], room);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private JSONObject getRoom(String macAddress) throws Exception {
+            URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress="+macAddress);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/string");
+            if (connection.getResponseCode() == 200) {
+                InputStream stream = connection.getInputStream();
+                return new JSONObject(readInput(stream));
+            }
+            return null;
+        }
+
+        private String readInput(InputStream is) throws IOException {
+            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+            String result = "", line;
+            while ((line = br.readLine()) != null) {
+                result += line+"\n";
+            }
+            if (!result.isEmpty()) {
+                result = result.substring(0,result.lastIndexOf('\n'));
+            }
+            return result;
         }
     }
 }

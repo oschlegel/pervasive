@@ -3,7 +3,7 @@ package com.computing.pervasive.myapplication;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.CheckBox;
+import android.widget.Switch;
 
 /**
  * Created by Thomas on 12.05.2015.
@@ -19,17 +19,17 @@ public class Settings extends Activity {
         SharedPreferences settings = getSharedPreferences(ONLINE_PREF, 0);
         boolean online = settings.getBoolean("ONLINE", false);
         setContentView(R.layout.activity_settings);
-        CheckBox cb = (CheckBox) findViewById(R.id.checkBoxOnline);
-        cb.setChecked(online);
+        Switch sw = (Switch) findViewById(R.id.switch_online);
+        sw.setChecked(online);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        CheckBox cb = (CheckBox) findViewById(R.id.checkBoxOnline);
+        Switch sw = (Switch) findViewById(R.id.switch_online);
         SharedPreferences settings = getSharedPreferences(ONLINE_PREF, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("ONLINE", cb.isChecked());
+        editor.putBoolean("ONLINE", sw.isChecked());
         editor.commit();
     }
 }

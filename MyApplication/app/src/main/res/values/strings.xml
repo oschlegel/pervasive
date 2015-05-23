@@ -12,6 +12,6 @@
     <string name="room_detail_lblRoomName">RoomName:</string>
     <string name="lblLecture">Lecture:</string>
     <string name="setting_online">Daten online abrufen?</string>
-    <string name="setting_checkBox_online">online abrufen</string>
+    <string name="setting_switch_online">online abrufen</string>
     <string name="lblRoom">Raum:</string>
 </resources>

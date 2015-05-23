@@ -136,9 +136,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
             addMyBeaconSQL(db, b3);
             addMyBeaconSQL(db, b4);
 
-            Room room1 = new Room(1, "1/101", 40, "Beamer", b1, bau1);
+            Room room1 = new Room(1, "?/101", 40, "Beamer", b1, bau1);
             Room room2 = new Room(2, "1/102", 30, "PC-Pool", b2, bau1);
-            Room room3 = new Room(3, "1/202", 30, "PC-Pool", b3, bau1);
+            Room room3 = new Room(3, "?/202", 30, "PC-Pool", b3, bau1);
             Room room4 = new Room(4, "1/201", 40, "Beamer", b4, bau1);
             addRoomSQL(db, room1);
             addRoomSQL(db, room2);

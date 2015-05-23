@@ -1,6 +1,8 @@
 package com.computing.pervasive.myapplication;
 
 import org.altbeacon.beacon.Identifier;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
@@ -22,6 +24,14 @@ public class MyBeacon implements Serializable {
         this.id2 = id2;
         this.id3 = id3;
         this.macAddress = macAddress;
+    }
+
+    public MyBeacon(JSONObject object) throws JSONException {
+        id = object.getInt("id");
+        id1 = object.getString("id1");
+        id2 = object.getString("id2");
+        id3 = object.getString("id3");
+        macAddress = object.getString("macaddress");
     }
 
     public int getID() {
