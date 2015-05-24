@@ -55,18 +55,12 @@ public class RoomDetail extends ActionBarActivity {
         if (room != null) {
             TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
             lblRoomNumber.setText(room.toString());
-            TextView beaconID = (TextView) findViewById(R.id.beaconID);
-            beaconID.setText(room.getMyBeacon().getMacAddress());
             TextView seatcount = (TextView) findViewById(R.id.seat_count);
             seatcount.setText("" + room.getSeatCount());
             TextView setup = (TextView) findViewById(R.id.room_setup);
             setup.setText(room.getSetup());
-            TextView building = (TextView) findViewById(R.id.building);
-            building.setText("" + room.getBuilding().getBuildingID());
-            TextView roomID = (TextView) findViewById(R.id.roomID);
-            roomID.setText("" + room.getRoomID());
-            TextView roomName = (TextView) findViewById(R.id.roomName);
-            roomName.setText(room.getRoomName());
+            TextView lblLectureName = (TextView) findViewById(R.id.lecture);
+            lblLectureName.setText("keine Vorlesung");
         }
     }
 
@@ -127,21 +121,10 @@ public class RoomDetail extends ActionBarActivity {
                         }
                         TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
                         lblRoomNumber.setText(name);
-                        TextView beaconID = (TextView) findViewById(R.id.beaconID);
-                        beaconID.setText(macAddress);
                         TextView lblSeatCount = (TextView) findViewById(R.id.seat_count);
                         lblSeatCount.setText("" + seatCount);
                         TextView lblSetup = (TextView) findViewById(R.id.room_setup);
                         lblSetup.setText(setup);
-                        TextView lblBuilding = (TextView) findViewById(R.id.building);
-                        lblBuilding.setText("" + buildingID);
-                        TextView lblRoomID = (TextView) findViewById(R.id.roomID);
-                        lblRoomID.setText("" + roomID);
-                        TextView lblRoomName = (TextView) findViewById(R.id.roomName);
-                        lblRoomName.setText(name);
-
-                        TextView txt = (TextView) findViewById(R.id.building);
-                        txt.setText(""+buildingID);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

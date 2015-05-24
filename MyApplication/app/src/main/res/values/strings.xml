@@ -4,13 +4,13 @@
 
     <string name="action_settings">Einstellungen</string>
     <string name="room_detail_lblRoom">Raum:</string>
-    <string name="room_detail_lblBeaconID">BeaconID:</string>
-    <string name="room_detail_lblSeat_Count">Seat Count:</string>
-    <string name="room_detail_lblSetup">Setup:</string>
-    <string name="room_detail_lblBuilding">Building:</string>
+    <string name="room_detail_lblBeaconID">Raumnummer:</string>
+    <string name="room_detail_lblSeat_Count">Sitze:</string>
+    <string name="room_detail_lblSetup">Ausstattung:</string>
+    <string name="room_detail_lblBuilding">Gebäude:</string>
     <string name="room_detail_lblRoomID">RoomID:</string>
     <string name="room_detail_lblRoomName">RoomName:</string>
-    <string name="lblLecture">Lecture:</string>
+    <string name="lblLecture">Vorlesung:</string>
     <string name="setting_online">Daten online abrufen?</string>
     <string name="setting_switch_online">online abrufen</string>
     <string name="lblRoom">Raum:</string>

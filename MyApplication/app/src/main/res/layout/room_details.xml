@@ -1,107 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/room_details">
+    android:background="#ffbdd4ff">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/room_detail_lblRoom"
-        android:id="@+id/lblRoom" />
+<RelativeLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/room_details"
+    android:layout_marginLeft="5dp"
+    android:layout_marginTop="5dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/lblRoomNumber" />
+        android:text="@string/room_detail_lblRoom"
+        android:id="@+id/lblRoom"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/lblRoomNumber"
+        android:focusableInTouchMode="false"
+        android:layout_toRightOf="@+id/lblSetup"
+        android:layout_alignTop="@+id/lblRoom" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/lblBeaconID"
-        android:text="@string/room_detail_lblBeaconID" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/beaconID" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/room_detail_lblSeat_Count"
-        android:id="@+id/lblSeat_Count" />
+        android:id="@+id/lblSeat_Count"
+        android:layout_below="@+id/lblSetup"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/seat_count"
+        android:layout_toRightOf="@+id/lblSetup"
+        android:layout_alignTop="@+id/lblSeat_Count" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/seat_count" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/lblSetup"
-        android:text="@string/room_detail_lblSetup" />
+        android:text="@string/room_detail_lblSetup"
+        android:layout_below="@+id/lblLecture"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/room_setup" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/lblBuilding"
-        android:text="@string/room_detail_lblBuilding" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/building" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/room_detail_lblRoomID"
-        android:id="@+id/lblRoomID" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/roomID" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/room_detail_lblRoomName"
-        android:id="@+id/lblRoomName" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/roomName" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/room_setup"
+        android:layout_alignTop="@+id/lblSetup"
+        android:layout_toRightOf="@+id/lblSetup" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/lblLecture"
-        android:id="@+id/lblLecture" />
+        android:id="@+id/lblLecture"
+        android:layout_below="@+id/lblRoom"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/lecture" />
+        android:id="@+id/lecture"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_toRightOf="@+id/lblSetup"
+        android:layout_alignTop="@+id/lblLecture" />
 
-</LinearLayout>
+</RelativeLayout>
+</FrameLayout>
