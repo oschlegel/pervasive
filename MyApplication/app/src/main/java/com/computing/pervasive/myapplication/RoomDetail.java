@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +27,7 @@ import java.net.URL;
 public class RoomDetail extends ActionBarActivity {
 
     private static final String ONLINE_PREF = "ONLINE_PREFERENCE";
+    private final MyDBHandler handlerDB = new MyDBHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,9 @@ public class RoomDetail extends ActionBarActivity {
 
         if (intent.hasExtra("ROOM")) {
             Room room = (Room) intent.getSerializableExtra("ROOM");
+            Lecture lecture = handlerDB.getLecture(room);
 
-            setView(room);
+            setView(room, lecture);
         }
 
         SharedPreferences settings = getSharedPreferences(ONLINE_PREF, 0);
@@ -50,17 +53,25 @@ public class RoomDetail extends ActionBarActivity {
         }
     }
 
-    private void setView(Room room)
+    private void setView(Room room, Lecture lecture)
     {
         if (room != null) {
             TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
             lblRoomNumber.setText(room.toString());
-            TextView seatcount = (TextView) findViewById(R.id.seat_count);
-            seatcount.setText("" + room.getSeatCount());
+            TextView seatCount = (TextView) findViewById(R.id.seat_count);
+            seatCount.setText("" + room.getSeatCount());
             TextView setup = (TextView) findViewById(R.id.room_setup);
             setup.setText(room.getSetup());
+
             TextView lblLectureName = (TextView) findViewById(R.id.lecture);
-            lblLectureName.setText("keine Vorlesung");
+
+            if (lecture != null) {
+                String lectureName = lecture.getName();
+                lblLectureName.setText(lectureName);
+            }
+            else {
+                lblLectureName.setText("keine Vorlesung");
+            }
         }
     }
 
@@ -105,26 +116,22 @@ public class RoomDetail extends ActionBarActivity {
 
                 if (room != null) {
                     try {
-                        int seatCount = room.getInt("seatcount");
-                        String setup = room.getString("setup");
-                        int roomID = room.getInt("id");
-                        String name = room.getString("name");
-                        JSONObject building = room.getJSONObject("building");
-                        JSONObject myBeacon = room.getJSONObject("mybeacon");
-                        int buildingID = -1;
-                        if (building != null) {
-                            buildingID = building.getInt("id");
-                        }
-                        String macAddress = "";
-                        if (myBeacon != null) {
-                            macAddress = myBeacon.getString("macaddress");
-                        }
+                        boolean found = room.getBoolean("found");
                         TextView lblRoomNumber = (TextView) findViewById(R.id.lblRoomNumber);
-                        lblRoomNumber.setText(name);
                         TextView lblSeatCount = (TextView) findViewById(R.id.seat_count);
-                        lblSeatCount.setText("" + seatCount);
                         TextView lblSetup = (TextView) findViewById(R.id.room_setup);
-                        lblSetup.setText(setup);
+                        if (found) {
+                            String name = room.getString("name");
+                            int seatCount = room.getInt("seatcount");
+                            String setup = room.getString("setup");
+                            lblRoomNumber.setText(name);
+                            lblSeatCount.setText("" + seatCount);
+                            lblSetup.setText(setup);
+                        }
+                        else {
+                            Toast toast = Toast.makeText(RoomDetail.this, R.string.no_room_not_found_for_beacon, Toast.LENGTH_LONG);
+                            toast.show();
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -132,16 +139,23 @@ public class RoomDetail extends ActionBarActivity {
 
                 if (lecture != null) {
                     try {
-                        String lectureName = lecture.getString("name");
+                        boolean found = lecture.getBoolean("found");
                         TextView lblLectureName = (TextView) findViewById(R.id.lecture);
-                        lblLectureName.setText(lectureName);
+                        if (found) {
+                            String lectureName = lecture.getString("name");
+                            lblLectureName.setText(lectureName);
+                        }
+                        else {
+                            lblLectureName.setText("keine Vorlesung");
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }
 
-                } else {
-                    TextView lblLectureName = (TextView) findViewById(R.id.lecture);
-                    lblLectureName.setText("keine Vorlesung");
+                if (room == null || lecture == null) {
+                    Toast toast = Toast.makeText(RoomDetail.this, R.string.no_internet, Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
 
@@ -157,7 +171,10 @@ public class RoomDetail extends ActionBarActivity {
             connection.setRequestProperty("Accept", "application/string");
             if (connection.getResponseCode() == 200) {
                 InputStream stream = connection.getInputStream();
-                return new JSONObject(readInput(stream));
+                return new JSONObject(readInput(stream)).put("found", true);
+            }
+            if (connection.getResponseCode() == 404) {
+                return new JSONObject().put("found", false);
             }
             return null;
         }
@@ -169,7 +186,10 @@ public class RoomDetail extends ActionBarActivity {
             connection.setRequestProperty("Accept", "application/string");
             if (connection.getResponseCode() == 200) {
                 InputStream stream = connection.getInputStream();
-                return new JSONObject(readInput(stream));
+                return new JSONObject(readInput(stream)).put("found", true);
+            }
+            if (connection.getResponseCode() == 404) {
+                return new JSONObject().put("found", false);
             }
             return null;
         }

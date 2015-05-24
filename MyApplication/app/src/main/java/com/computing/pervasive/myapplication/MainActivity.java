@@ -50,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
 
     protected static final String TAG = "MainActivity";
     private BeaconManager beaconManager;
-    private MyDBHandler handlerDB = new MyDBHandler(this);
+    private final MyDBHandler handlerDB = new MyDBHandler(this);
     private Region REGION = new Region("MyUnifiedID", null, null, null);
     MainActivity instance;
     private Map<String, Room> beaconRoomMap = new HashMap<>();

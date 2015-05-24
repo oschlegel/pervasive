@@ -45,6 +45,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_BLOCK_START = "start";
     public static final String COLUMN_BLOCK_END = "end";
     public static final String COLUMN_LECTURE_ID = "lectureid";
+    public static final String COLUMN_LECTURE_NAME = "lecturename";
     public static final String COLUMN_LECTURE_BEGIN = "begin";
     public static final String COLUMN_LECTURE_END = "end";
     public static final String COLUMN_LECTURER = "lecturer";
@@ -53,7 +54,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_BEACON_ID1 = "beaconid1";
     public static final String COLUMN_BEACON_ID2 = "beaconid2";
     public static final String COLUMN_BEACON_ID3 = "beaconid3";
-    public static final String COLUMN_MAC_ADRESS = "macadress";
+    public static final String COLUMN_MAC_ADDRESS = "macaddress";
     public static final String COLUMN_MYBEACON = "mybeacon";
 
     private final String ENABLE_FOREIGN_KEYS = "PRAGMA foreign_keys = ON;";
@@ -74,7 +75,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             + COLUMN_BEACON_ID1 + " TEXT NOT NULL, "
             + COLUMN_BEACON_ID2 + " TEXT NOT NULL, "
             + COLUMN_BEACON_ID3 + " TEXT NOT NULL, "
-            + COLUMN_MAC_ADRESS + " TEXT NOT NULL"
+            + COLUMN_MAC_ADDRESS + " TEXT NOT NULL"
             + ");";
     private final String CREATE_ROOM_TABLE = "CREATE TABLE " + TABLE_ROOMS + "("
             + COLUMN_ROOM_ID + " INTEGER NOT NULL PRIMARY KEY, "
@@ -88,6 +89,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             + ");";
     private final String CREATE_LECTURE_TABLE = "CREATE TABLE " + TABLE_LECTURE + "("
             + COLUMN_LECTURE_ID + " INT NOT NULL PRIMARY KEY, "
+            + COLUMN_LECTURE_NAME + " TEXT NOT NULL, "
             + COLUMN_LECTURE_BEGIN + " TEXT NOT NULL, "
             + COLUMN_LECTURE_END + " TEXT NOT NULL, "
             + COLUMN_LECTURER + " TEXT, "
@@ -172,7 +174,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_BEACON_ID1, myBeacon.getID1());
         values.put(COLUMN_BEACON_ID2, myBeacon.getID2());
         values.put(COLUMN_BEACON_ID3, myBeacon.getID3());
-        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAddress());
+        values.put(COLUMN_MAC_ADDRESS, myBeacon.getMacAddress());
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(TABLE_MYBEACONS, null, values);
@@ -195,6 +197,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     private void addLecture(Lecture lecture){
         ContentValues values = new ContentValues();
         values.put(COLUMN_LECTURE_ID, lecture.getLectureID());
+        values.put(COLUMN_LECTURE_NAME, lecture.getName());
         values.put(COLUMN_LECTURE_BEGIN, dateFormat.format(lecture.getBegin()));
         values.put(COLUMN_LECTURE_END, dateFormat.format(lecture.getEnd()));
         values.put(COLUMN_LECTURER, lecture.getLecturer());
@@ -307,7 +310,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_BEACON_ID1, myBeacon.getID1());
         values.put(COLUMN_BEACON_ID2, myBeacon.getID2());
         values.put(COLUMN_BEACON_ID3, myBeacon.getID3());
-        values.put(COLUMN_MAC_ADRESS, myBeacon.getMacAddress());
+        values.put(COLUMN_MAC_ADDRESS, myBeacon.getMacAddress());
         db.insert(TABLE_MYBEACONS, null, values);
     }
 
@@ -337,6 +340,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     private void addLectureSQL(SQLiteDatabase db, Lecture lecture){
         ContentValues values = new ContentValues();
         values.put(COLUMN_LECTURE_ID, lecture.getLectureID());
+        values.put(COLUMN_LECTURE_NAME, lecture.getName());
         values.put(COLUMN_LECTURE_BEGIN, dateFormat.format(lecture.getBegin()));
         values.put(COLUMN_LECTURE_END, dateFormat.format(lecture.getEnd()));
         values.put(COLUMN_LECTURER, lecture.getLecturer());
@@ -382,13 +386,13 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return myBeacon;
     }
 
-    public MyBeacon getMyBeacon(String macAdress)
+    public MyBeacon getMyBeacon(String macAddress)
     {
         MyBeacon myBeacon = null;
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_MYBEACONS, null, COLUMN_MAC_ADRESS + " = '" + macAdress + "'", null, null, null, null);
+        Cursor cursor = db.query(TABLE_MYBEACONS, null, COLUMN_MAC_ADDRESS + " = '" + macAddress + "'", null, null, null, null);
         if (cursor.moveToFirst())
         {
             myBeacon = new MyBeacon(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
@@ -410,6 +414,24 @@ public class MyDBHandler extends SQLiteOpenHelper {
         }
         cursor.close();
         return myBeacon;
+    }
+
+    public Lecture getLecture(Room room) {
+        Lecture lecture = null;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID(), null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            Block block = getBlock(cursor.getInt(5));
+
+            lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return lecture;
     }
 
     public Block getBlock(int id)

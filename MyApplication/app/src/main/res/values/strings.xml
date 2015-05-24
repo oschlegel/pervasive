@@ -4,7 +4,7 @@
 
     <string name="action_settings">Einstellungen</string>
     <string name="room_detail_lblRoom">Raum:</string>
-    <string name="room_detail_lblBeaconID">Raumnummer:</string>
+    <string name="room_detail_lblRoomNumber">Raumnummer:</string>
     <string name="room_detail_lblSeat_Count">Sitze:</string>
     <string name="room_detail_lblSetup">Ausstattung:</string>
     <string name="room_detail_lblBuilding">Gebäude:</string>
@@ -15,4 +15,6 @@
     <string name="setting_switch_online">online abrufen</string>
     <string name="lblRoom">Raum:</string>
     <string name="waiting_Dialog">Bitte warten</string>
+    <string name="no_internet">keine Internetverbindung</string>
+    <string name="no_room_not_found_for_beacon">Diesem Beacon ist zur Zeit kein Raum zugeordnet.</string>
 </resources>
