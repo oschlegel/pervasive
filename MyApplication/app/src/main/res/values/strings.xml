@@ -17,4 +17,21 @@
     <string name="waiting_Dialog">Bitte warten</string>
     <string name="no_internet">keine Internetverbindung</string>
     <string name="no_room_not_found_for_beacon">Diesem Beacon ist zur Zeit kein Raum zugeordnet.</string>
+    <string name="roomDetails_lblDayView">Tagesübersicht</string>
+    <string name="roomDetails_lblBlock1">1. Block:</string>
+    <string name="roomDetails_lblBlock2">2. Block:</string>
+    <string name="roomDetails_lblBlock3">3. Block:</string>
+    <string name="roomDetails_lblBlock4">4. Block:</string>
+    <string name="roomDetails_lblBlock5">5. Block:</string>
+    <string name="roomDetails_lblBlock6">6. Block:</string>
+    <string name="no_lecture">keine Vorlesung</string>
+    <string name="no_lecture_short">frei</string>
+    <string name="no_bluetooth_detected">Kein Bluetooth erkannt!</string>
+    <string name="no_bluetooth_detected_message">Auf diesem Gerät kann die App nicht genutzt werden.</string>
+    <string name="btn_exit">HfT Roomer beenden</string>
+    <string name="bluetooth_disabled">Bluetooth ausgeschaltet</string>
+    <string name="bluetooth_disabled_message">Bluetooth einschalten?</string>
+    <string name="btn_enabe">Einschalten</string>
+    <string name="no_internet_message">Bitte eine Verbindung zum Internet herstellen oder in den Offline-Modus wechseln.</string>
+    <string name="btn_close">Schließen</string>
 </resources>

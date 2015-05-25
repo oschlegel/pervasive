@@ -151,12 +151,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
             addRoomSQL(db, room4);
 
             try {
-                addLectureSQL(db, new Lecture(1, "UBQ1", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 1), room1));
-                addLectureSQL(db, new Lecture(2, "UBQ2", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 2), room1));
-                addLectureSQL(db, new Lecture(3, "UBQ3", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 3), room1));
-                addLectureSQL(db, new Lecture(4, "UBQ4", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 4), room1));
-                addLectureSQL(db, new Lecture(5, "UBQ5", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 5), room1));
-                addLectureSQL(db, new Lecture(6, "UBQ6", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 6), room1));
+                addLectureSQL(db, new Lecture(1, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 7), room1));
+                addLectureSQL(db, new Lecture(2, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 8), room1));
+                addLectureSQL(db, new Lecture(3, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 9), room1));
+                addLectureSQL(db, new Lecture(4, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 10), room1));
+                addLectureSQL(db, new Lecture(5, "HPC", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 11), room1));
+                addLectureSQL(db, new Lecture(6, "ECom", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 12), room1));
                 addLectureSQL(db, new Lecture(7, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 1), room3));
             }
             catch (ParseException pe) {
@@ -455,6 +455,29 @@ public class MyDBHandler extends SQLiteOpenHelper {
             cursor.close();
         }
         return lecture;
+    }
+
+    public List<Lecture> getDailyLecturesInRoom(Room room) {
+        List<Lecture> lectures = new ArrayList<>(6);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String date_now = dateFormat.format(new Date());
+
+        Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID() + " AND " + COLUMN_LECTURE_BEGIN + " < '" + date_now + "' AND " + COLUMN_LECTURE_END + " > '" + date_now + "'", null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            do {
+                Block block = getBlock(cursor.getInt(5));
+                Lecture lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
+                lectures.add(lecture);
+            }
+            while (cursor.moveToNext());
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return lectures;
     }
 
     public Lecture getLecture(int id) {

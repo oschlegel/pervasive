@@ -68,15 +68,15 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         if (mBluetoothAdapter == null) {
             Log.d(TAG, "No Bluetooth detected!");
             new AlertDialog.Builder(this)
-                    .setTitle("No Bluetooth detected!")
-                    .setMessage("You can't use this app on your device.")
+                    .setTitle(R.string.no_bluetooth_detected)
+                    .setMessage(R.string.no_bluetooth_detected_message)
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
                             finish();
                         }
                     })
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.btn_exit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -84,35 +84,35 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
                     }).show();
 
         } else {
+            if (isOnlineMode() && !isOnline()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.no_internet)
+                        .setMessage(R.string.no_internet_message)
+                        .setPositiveButton(R.string.btn_close, null)
+                        .show();
+            }
             if (!mBluetoothAdapter.isEnabled()) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Bluetooth disabled")
-                        .setMessage("Do you want to enable bluetooth?\nOtherwise you close this app.")
+                        .setTitle(R.string.bluetooth_disabled)
+                        .setMessage(R.string.bluetooth_disabled_message)
                         .setOnCancelListener(new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialog) {
                                 finish();
                             }
                         })
-                        .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.btn_enabe, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 BluetoothAdapter.getDefaultAdapter().enable();
                             }
                         })
-                        .setNegativeButton("Close app", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.btn_exit, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
                             }
                         })
-                        .show();
-            }
-            if (isOnlineMode() && !isOnline()) {
-                new AlertDialog.Builder(this)
-                        .setTitle("kein Internet verf\u00FCgbar")
-                        .setMessage("Bitte eine Verbindung zum Internet herstellen oder in den Offline-Modus wechseln")
-                        .setPositiveButton("Ok", null)
                         .show();
             }
 

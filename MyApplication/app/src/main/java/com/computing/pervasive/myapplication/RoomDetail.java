@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by Thomas on 06.04.2015.
@@ -63,6 +64,15 @@ public class RoomDetail extends ActionBarActivity {
             TextView setup = (TextView) findViewById(R.id.room_setup);
             setup.setText(room.getSetup());
 
+            TextView txtBlock1 = (TextView) findViewById(R.id.roomDetails_txtBlock1);
+            TextView txtBlock2 = (TextView) findViewById(R.id.roomDetails_txtBlock2);
+            TextView txtBlock3 = (TextView) findViewById(R.id.roomDetails_txtBlock3);
+            TextView txtBlock4 = (TextView) findViewById(R.id.roomDetails_txtBlock4);
+            TextView txtBlock5 = (TextView) findViewById(R.id.roomDetails_txtBlock5);
+            TextView txtBlock6 = (TextView) findViewById(R.id.roomDetails_txtBlock6);
+
+
+
             TextView lblLectureName = (TextView) findViewById(R.id.lecture);
 
             if (lecture != null) {
@@ -70,7 +80,47 @@ public class RoomDetail extends ActionBarActivity {
                 lblLectureName.setText(lectureName);
             }
             else {
-                lblLectureName.setText("keine Vorlesung");
+                lblLectureName.setText(R.string.no_lecture);
+            }
+
+            txtBlock1.setText(R.string.no_lecture_short);
+            txtBlock2.setText(R.string.no_lecture_short);
+            txtBlock3.setText(R.string.no_lecture_short);
+            txtBlock4.setText(R.string.no_lecture_short);
+            txtBlock5.setText(R.string.no_lecture_short);
+            txtBlock6.setText(R.string.no_lecture_short);
+
+            List<Lecture> lectures = handlerDB.getDailyLecturesInRoom(room);
+            if (lectures != null && !lectures.isEmpty()) {
+                for (Lecture l : lectures) {
+                    Block block = l.getBlock();
+                    int index = block.getBlockID();
+                    index %= 6;
+                    String text = l.getName();
+                    if (text == null || text.isEmpty()) {
+                        text = getString(R.string.no_lecture_short);
+                    }
+                    switch (index) {
+                        case 1:
+                            txtBlock1.setText(text);
+                            break;
+                        case 2:
+                            txtBlock2.setText(text);
+                            break;
+                        case 3:
+                            txtBlock3.setText(text);
+                            break;
+                        case 4:
+                            txtBlock4.setText(text);
+                            break;
+                        case 5:
+                            txtBlock5.setText(text);
+                            break;
+                        case 0:
+                            txtBlock6.setText(text);
+                            break;
+                    }
+                }
             }
         }
     }
