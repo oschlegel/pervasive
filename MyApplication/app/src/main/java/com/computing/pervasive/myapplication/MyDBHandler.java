@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.sql.Time;
 import java.text.ParseException;
@@ -19,6 +20,8 @@ import java.util.List;
  *
  */
 public class MyDBHandler extends SQLiteOpenHelper {
+
+    private static final String TAG = "MyDBHandler";
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -116,12 +119,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
             int i = 1;
             for (Day d : Day.values()) {
-                addBlockSQL(db, new Block(i, null, new Time(28800000l), new Time(34200000l), d));
-                addBlockSQL(db, new Block(i+1, null, new Time(35100000l), new Time(40500000l), d));
-                addBlockSQL(db, new Block(i+2, null, new Time(41400000l), new Time(46800000l), d));
-                addBlockSQL(db, new Block(i+3, null, new Time(50400000l), new Time(55800000l), d));
-                addBlockSQL(db, new Block(i+4, null, new Time(56700000l), new Time(62100000l), d));
-                addBlockSQL(db, new Block(i+5, null, new Time(63000000l), new Time(68400000l), d));
+                addBlockSQL(db, new Block(i, null, new Time(25200000l), new Time(30600000l), d));
+                addBlockSQL(db, new Block(i+1, null, new Time(31500000l), new Time(36900000l), d));
+                addBlockSQL(db, new Block(i+2, null, new Time(37800000l), new Time(43200000l), d));
+                addBlockSQL(db, new Block(i+3, null, new Time(46800000l), new Time(52200000l), d));
+                addBlockSQL(db, new Block(i+4, null, new Time(53100000l), new Time(58500000l), d));
+                addBlockSQL(db, new Block(i+5, null, new Time(59400000l), new Time(64800000l), d));
                 i+=6;
             }
 
@@ -147,8 +150,18 @@ public class MyDBHandler extends SQLiteOpenHelper {
             addRoomSQL(db, room3);
             addRoomSQL(db, room4);
 
-            addLectureSQL(db, new Lecture(1, "UBQ", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room1));
-            addLectureSQL(db, new Lecture(2, "ECom", new Date(1000), new Date(2000), "Teacher", getBlockSQL(db, 1), room3));
+            try {
+                addLectureSQL(db, new Lecture(1, "UBQ1", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 1), room1));
+                addLectureSQL(db, new Lecture(2, "UBQ2", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 2), room1));
+                addLectureSQL(db, new Lecture(3, "UBQ3", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 3), room1));
+                addLectureSQL(db, new Lecture(4, "UBQ4", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 4), room1));
+                addLectureSQL(db, new Lecture(5, "UBQ5", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 5), room1));
+                addLectureSQL(db, new Lecture(6, "UBQ6", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 6), room1));
+                addLectureSQL(db, new Lecture(7, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 1), room3));
+            }
+            catch (ParseException pe) {
+                Log.e(TAG, pe.getMessage());
+            }
 
         }
         catch (SQLiteException e)
@@ -416,15 +429,44 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return myBeacon;
     }
 
-    public Lecture getLecture(Room room) {
+    public Lecture getCurrentLectureInRoom(Room room) {
         Lecture lecture = null;
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID(), null, null, null, null);
+        String date_now = dateFormat.format(new Date());
+
+        Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID() + " AND " + COLUMN_LECTURE_BEGIN + " < '" + date_now + "' AND " + COLUMN_LECTURE_END + " > '" + date_now + "'", null, null, null, null);
+        if (cursor.moveToFirst())
+        {
+            Time time_now = parseTime(timeFormat.format(new Date()));
+            do {
+                Block block = getBlock(cursor.getInt(5));
+                Time start = block.getStart();
+                Time end = block.getEnd();
+                if (time_now.after(start) && time_now.before(end)) {
+                    lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
+                    break;
+                }
+            }
+            while (cursor.moveToNext());
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return lecture;
+    }
+
+    public Lecture getLecture(int id) {
+        Lecture lecture = null;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_LECTURE_ID + " = " + id, null, null, null, null);
         if (cursor.moveToFirst())
         {
             Block block = getBlock(cursor.getInt(5));
+            Room room = findRoom(cursor.getInt(6));
 
             lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
         }
@@ -461,26 +503,28 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     private Time parseTime(String str)
     {
+        Time time = null;
         try {
             Date d = timeFormat.parse(str);
-            return new Time(d.getTime());
+            time = new Time(d.getTime());
         }
         catch (ParseException pe)
         {
             pe.printStackTrace();
         }
-        return null;
+        return time;
     }
 
     private Date parseDate(String str)
     {
+        Date date = null;
         try {
-            Date d = dateFormat.parse(str);
+            date = dateFormat.parse(str);
         }
         catch (ParseException pe)
         {
             pe.printStackTrace();
         }
-        return null;
+        return date;
     }
 }

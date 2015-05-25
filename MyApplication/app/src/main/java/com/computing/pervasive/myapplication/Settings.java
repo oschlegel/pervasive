@@ -1,14 +1,14 @@
 package com.computing.pervasive.myapplication;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.Switch;
 
 /**
  * Created by Thomas on 12.05.2015.
  */
-public class Settings extends Activity {
+public class Settings extends ActionBarActivity {
 
     private static final String ONLINE_PREF = "ONLINE_PREFERENCE";
 

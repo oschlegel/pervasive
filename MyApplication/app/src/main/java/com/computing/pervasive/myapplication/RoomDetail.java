@@ -37,7 +37,7 @@ public class RoomDetail extends ActionBarActivity {
 
         if (intent.hasExtra("ROOM")) {
             Room room = (Room) intent.getSerializableExtra("ROOM");
-            Lecture lecture = handlerDB.getLecture(room);
+            Lecture lecture = handlerDB.getCurrentLectureInRoom(room);
 
             setView(room, lecture);
         }
