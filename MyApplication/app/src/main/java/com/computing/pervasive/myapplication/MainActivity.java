@@ -120,7 +120,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             if (beaconManager == null) {
                 beaconManager = BeaconManager.getInstanceForApplication(this);
                 if (beaconManager != null) {
-                    BeaconParser bp = new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24");
+                    BeaconParser bp = new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
                     if (beaconManager.getBeaconParsers().size() < 2) {
                         beaconManager.getBeaconParsers().add(bp);
                     }
