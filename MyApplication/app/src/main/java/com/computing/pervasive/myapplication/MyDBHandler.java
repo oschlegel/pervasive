@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -155,9 +156,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 addLectureSQL(db, new Lecture(2, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 8), room1));
                 addLectureSQL(db, new Lecture(3, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 9), room1));
                 addLectureSQL(db, new Lecture(4, "UBQ", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 10), room1));
-                addLectureSQL(db, new Lecture(5, "HPC", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 11), room1));
+                addLectureSQL(db, new Lecture(5, "HPC", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 5), room1));
                 addLectureSQL(db, new Lecture(6, "ECom", dateFormat.parse("2015-04-02 00:00:00"), dateFormat.parse("2015-06-26 00:00:00"), "Teacher", getBlockSQL(db, 12), room1));
-                addLectureSQL(db, new Lecture(7, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 1), room3));
+                addLectureSQL(db, new Lecture(7, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 1), room2));
+                addLectureSQL(db, new Lecture(8, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 10), room2));
+                addLectureSQL(db, new Lecture(9, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 1), room3));
+                addLectureSQL(db, new Lecture(10, "ECom", dateFormat.parse("2015-04-23 00:00:00"), dateFormat.parse("2015-06-24 00:00:00"), "Teacher", getBlockSQL(db, 10), room3));
             }
             catch (ParseException pe) {
                 Log.e(TAG, pe.getMessage());
@@ -434,7 +438,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String date_now = dateFormat.format(new Date());
+        Date date = new Date();
+        String date_now = dateFormat.format(date);
 
         Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID() + " AND " + COLUMN_LECTURE_BEGIN + " < '" + date_now + "' AND " + COLUMN_LECTURE_END + " > '" + date_now + "'", null, null, null, null);
         if (cursor.moveToFirst())
@@ -442,9 +447,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
             Time time_now = parseTime(timeFormat.format(new Date()));
             do {
                 Block block = getBlock(cursor.getInt(5));
+                Day day = getDay(date);
                 Time start = block.getStart();
                 Time end = block.getEnd();
-                if (time_now.after(start) && time_now.before(end)) {
+                if (time_now.after(start) && time_now.before(end) && block.getDay().equals(day)) {
                     lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
                     break;
                 }
@@ -462,15 +468,20 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String date_now = dateFormat.format(new Date());
+
+        Date date = new Date();
+        String date_now = dateFormat.format(date);
 
         Cursor cursor = db.query(TABLE_LECTURE, null, COLUMN_ROOM + " = " + room.getRoomID() + " AND " + COLUMN_LECTURE_BEGIN + " < '" + date_now + "' AND " + COLUMN_LECTURE_END + " > '" + date_now + "'", null, null, null, null);
         if (cursor.moveToFirst())
         {
             do {
                 Block block = getBlock(cursor.getInt(5));
-                Lecture lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
-                lectures.add(lecture);
+                Day day = getDay(date);
+                if (block.getDay().equals(day)) {
+                    Lecture lecture = new Lecture(cursor.getInt(0), cursor.getString(1), parseDate(cursor.getString(2)), parseDate(cursor.getString(3)), cursor.getString(4), block, room);
+                    lectures.add(lecture);
+                }
             }
             while (cursor.moveToNext());
         }
@@ -478,6 +489,29 @@ public class MyDBHandler extends SQLiteOpenHelper {
             cursor.close();
         }
         return lectures;
+    }
+
+    private Day getDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:
+                return Day.Monday;
+            case Calendar.TUESDAY:
+                return Day.Tuesday;
+            case Calendar.WEDNESDAY:
+                return Day.Wednesday;
+            case Calendar.THURSDAY:
+                return Day.Thursday;
+            case Calendar.FRIDAY:
+                return Day.Friday;
+            case Calendar.SATURDAY:
+                return Day.Saturday;
+            case Calendar.SUNDAY:
+                return Day.Sunday;
+            default:
+                return null;
+        }
     }
 
     public Lecture getLecture(int id) {
