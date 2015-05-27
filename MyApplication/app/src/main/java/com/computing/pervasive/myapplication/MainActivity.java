@@ -219,7 +219,7 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
             Log.d(TAG, "No match found!");
 
             Context context = getApplicationContext();
-            CharSequence text = "No match found!";
+            CharSequence text = getResources().getText(R.string.no_room_not_found_for_beacon);
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);

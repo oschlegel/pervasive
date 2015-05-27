@@ -196,7 +196,7 @@ public class RoomDetail extends ActionBarActivity {
                             lblLectureName.setText(lectureName);
                         }
                         else {
-                            lblLectureName.setText("keine Vorlesung");
+                            lblLectureName.setText(R.string.no_lecture);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
