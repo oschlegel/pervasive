@@ -1,8 +1,11 @@
 package com.computing.pervasive.myapplication;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -215,31 +218,35 @@ public class RoomDetail extends ActionBarActivity {
         }
 
         private JSONObject getRoom(MyBeacon mybeacon) throws Exception {
-            URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress="+mybeacon.getMacAddress());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/string");
-            if (connection.getResponseCode() == 200) {
-                InputStream stream = connection.getInputStream();
-                return new JSONObject(readInput(stream)).put("found", true);
-            }
-            if (connection.getResponseCode() == 404) {
-                return new JSONObject().put("found", false);
+            if (isOnline()) {
+                URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress=" + mybeacon.getMacAddress());
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept", "application/string");
+                if (connection.getResponseCode() == 200) {
+                    InputStream stream = connection.getInputStream();
+                    return new JSONObject(readInput(stream)).put("found", true);
+                }
+                if (connection.getResponseCode() == 404) {
+                    return new JSONObject().put("found", false);
+                }
             }
             return null;
         }
 
         private JSONObject getLecture(MyBeacon mybeacon) throws Exception {
-            URL url = new URL("http://hftroomer.appspot.com/lectures?macAddress="+mybeacon.getMacAddress());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/string");
-            if (connection.getResponseCode() == 200) {
-                InputStream stream = connection.getInputStream();
-                return new JSONObject(readInput(stream)).put("found", true);
-            }
-            if (connection.getResponseCode() == 404) {
-                return new JSONObject().put("found", false);
+            if (isOnline()) {
+                URL url = new URL("http://hftroomer.appspot.com/lectures?macAddress=" + mybeacon.getMacAddress());
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept", "application/string");
+                if (connection.getResponseCode() == 200) {
+                    InputStream stream = connection.getInputStream();
+                    return new JSONObject(readInput(stream)).put("found", true);
+                }
+                if (connection.getResponseCode() == 404) {
+                    return new JSONObject().put("found", false);
+                }
             }
             return null;
         }
@@ -254,6 +261,12 @@ public class RoomDetail extends ActionBarActivity {
                 result = result.substring(0,result.lastIndexOf('\n'));
             }
             return result;
+        }
+
+        private boolean isOnline() {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            return netInfo != null && netInfo.isConnectedOrConnecting();
         }
     }
 }

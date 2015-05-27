@@ -328,13 +328,15 @@ public class MainActivity extends ActionBarActivity implements BeaconConsumer {
         }
 
         private JSONObject getRoom(String macAddress) throws Exception {
-            URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress="+macAddress);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/string");
-            if (connection.getResponseCode() == 200) {
-                InputStream stream = connection.getInputStream();
-                return new JSONObject(readInput(stream));
+            if (isOnline()) {
+                URL url = new URL("http://hftroomer.appspot.com/rooms?macAddress=" + macAddress);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept", "application/string");
+                if (connection.getResponseCode() == 200) {
+                    InputStream stream = connection.getInputStream();
+                    return new JSONObject(readInput(stream));
+                }
             }
             return null;
         }
